@@ -1,11 +1,13 @@
 package net.pincette.rs.streams;
 
+import static java.time.Duration.ofSeconds;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static net.pincette.rs.Chain.with;
 import static net.pincette.rs.PassThrough.passThrough;
 import static net.pincette.util.Pair.pair;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +18,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import net.pincette.rs.Fanout;
-import net.pincette.rs.Merge;
 import net.pincette.util.Pair;
 
 /**
@@ -41,7 +42,9 @@ public class Streams<K, V, T, U> {
   private final List<Pair<String, Processor<Message<K, V>, Message<K, V>>>> topicConsumers =
       new ArrayList<>();
   private final List<Pair<String, Publisher<Message<K, V>>>> topicProducers = new ArrayList<>();
+  private Duration gracePeriod;
   private Publisher<Message<K, V>> fromPublisher;
+  private TopicSink<K, V, U> sink;
   private TopicSource<K, V, T> source;
 
   protected Streams(
@@ -114,20 +117,22 @@ public class Streams<K, V, T, U> {
     return this;
   }
 
-  private void createTopicSink() {
+  private TopicSink<K, V, U> createTopicSink() {
     if (topicSink != null) {
       final Set<String> topics = topics(topicProducers);
 
       if (!topics.isEmpty()) {
-        final TopicSink<K, V, U> sink = topicSink.apply(topics);
+        final TopicSink<K, V, U> s = topicSink.apply(topics);
 
-        Merge.of(
-                topicProducers.stream()
-                    .map(pair -> connect(pair.second, pair.first, sink))
-                    .collect(toList()))
-            .subscribe(sink.subscriber());
+        topicProducers.stream()
+            .map(pair -> connect(pair.second, pair.first, s))
+            .forEach(publisher -> publisher.subscribe(s.subscriber()));
+
+        return s;
       }
     }
+
+    return null;
   }
 
   private TopicSource<K, V, T> createTopicSource() {
@@ -236,18 +241,39 @@ public class Streams<K, V, T, U> {
 
   /** Starts the streams instance. It blocks until the topic source finishes. */
   public void start() {
-    createTopicSink();
+    sink = createTopicSink();
     source = createTopicSource();
 
     if (source != null) {
       source.start();
+      stopSink(gracePeriod);
     }
   }
 
-  /** Signals the topic source to stop. This will unblock the <code>start</code> method. */
+  /** Calls <code>stop</code> with a grace period of three seconds. */
   public void stop() {
+    stop(ofSeconds(3));
+  }
+
+  /**
+   * Signals the topic source to stop. This will unblock the <code>start</code> method and stop the
+   * sink after a grace period it didn't complete naturally.
+   *
+   * @param gracePeriod the grace period.
+   */
+  public void stop(final Duration gracePeriod) {
+    this.gracePeriod = gracePeriod;
+
     if (source != null) {
       source.stop();
+    } else {
+      stopSink(gracePeriod);
+    }
+  }
+
+  private void stopSink(final Duration gracePeriod) {
+    if (sink != null) {
+      sink.stop(gracePeriod);
     }
   }
 

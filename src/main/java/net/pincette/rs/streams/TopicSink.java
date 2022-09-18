@@ -1,5 +1,6 @@
 package net.pincette.rs.streams;
 
+import java.time.Duration;
 import java.util.concurrent.Flow.Processor;
 import java.util.concurrent.Flow.Subscriber;
 
@@ -21,7 +22,16 @@ public interface TopicSink<K, V, T> {
   Processor<Message<K, V>, T> connect(final String topic);
 
   /**
-   * Returns the subscriber that represents the actual producer.
+   * Stops the topic sink. This method blocks until all subscribers are stopped.
+   *
+   * @param gracePeriod the period after which the subscriptions that didn't complete naturally will
+   *     be cancelled.
+   */
+  void stop(final Duration gracePeriod);
+
+  /**
+   * Returns a subscriber that represents the actual producer. Each call to this method should
+   * create a new subscriber, because a subscriber can have only one subscription at the time.
    *
    * @return The subscriber.
    */
