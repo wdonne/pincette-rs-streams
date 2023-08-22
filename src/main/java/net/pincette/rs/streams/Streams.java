@@ -33,6 +33,7 @@ import net.pincette.util.Pair;
  * @author Werner Donn\u00e9
  */
 public class Streams<K, V, T, U> {
+  private static final Duration DEFAULT_GRACE_PERIOD = ofSeconds(3);
   private static final String FROM_ERROR = "No preceding call to from.";
   private static final String TOPIC_SINK_ERROR = "No topic sink.";
   private static final String TOPIC_SOURCE_ERROR = "No topic source.";
@@ -42,7 +43,7 @@ public class Streams<K, V, T, U> {
   private final List<Pair<String, Processor<Message<K, V>, Message<K, V>>>> topicConsumers =
       new ArrayList<>();
   private final List<Pair<String, Publisher<Message<K, V>>>> topicProducers = new ArrayList<>();
-  private Duration gracePeriod;
+  private Duration gracePeriod = DEFAULT_GRACE_PERIOD;
   private Publisher<Message<K, V>> fromPublisher;
   private TopicSink<K, V, U> sink;
   private TopicSource<K, V, T> source;
@@ -252,7 +253,7 @@ public class Streams<K, V, T, U> {
 
   /** Calls <code>stop</code> with a grace period of three seconds. */
   public void stop() {
-    stop(ofSeconds(3));
+    stop(DEFAULT_GRACE_PERIOD);
   }
 
   /**
@@ -262,7 +263,8 @@ public class Streams<K, V, T, U> {
    * @param gracePeriod the grace period.
    */
   public void stop(final Duration gracePeriod) {
-    this.gracePeriod = gracePeriod;
+    this.gracePeriod =
+        gracePeriod != null && !gracePeriod.isNegative() ? gracePeriod : DEFAULT_GRACE_PERIOD;
 
     if (source != null) {
       source.stop();
