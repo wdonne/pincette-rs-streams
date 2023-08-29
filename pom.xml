@@ -6,7 +6,7 @@
 
   <groupId>net.pincette</groupId>
   <artifactId>pincette-rs-streams</artifactId>
-  <version>1.1.8</version>
+  <version>1.1.9</version>
   <packaging>jar</packaging>
   <name>pincette-rs-streams</name>
   <description>Reactive Streams API for Messaging</description>
@@ -57,7 +57,7 @@
     <dependency>
       <groupId>net.pincette</groupId>
       <artifactId>pincette-rs</artifactId>
-      <version>3.2</version>
+      <version>3.2.1</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
