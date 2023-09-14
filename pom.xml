@@ -6,7 +6,7 @@
 
   <groupId>net.pincette</groupId>
   <artifactId>pincette-rs-streams</artifactId>
-  <version>1.1.9</version>
+  <version>1.2</version>
   <packaging>jar</packaging>
   <name>pincette-rs-streams</name>
   <description>Reactive Streams API for Messaging</description>
@@ -57,7 +57,7 @@
     <dependency>
       <groupId>net.pincette</groupId>
       <artifactId>pincette-rs</artifactId>
-      <version>3.2.1</version>
+      <version>3.2.2</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -106,7 +106,7 @@
           <links>
             <link>https://docs.oracle.com/en/java/javase/11/docs/api/</link>
             <link>https://www.javadoc.io/doc/net.pincette/pincette-common/2.3.3/</link>
-            <link>https://www.javadoc.io/doc/net.pincette/pincette-rs/3.1.3/</link>
+            <link>https://www.javadoc.io/doc/net.pincette/pincette-rs/3.2.1/</link>
           </links>
           <sourceFileExcludes>
             <sourceFileExclude>**/module-info.java</sourceFileExclude>

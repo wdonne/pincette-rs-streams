@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static net.pincette.rs.Chain.with;
 import static net.pincette.rs.PassThrough.passThrough;
+import static net.pincette.rs.Util.onErrorProcessor;
 import static net.pincette.util.Pair.pair;
 
 import java.time.Duration;
@@ -45,6 +46,7 @@ public class Streams<K, V, T, U> {
   private final List<Pair<String, Publisher<Message<K, V>>>> topicProducers = new ArrayList<>();
   private Duration gracePeriod = DEFAULT_GRACE_PERIOD;
   private Publisher<Message<K, V>> fromPublisher;
+  private Consumer<Throwable> onError;
   private TopicSink<K, V, U> sink;
   private TopicSource<K, V, T> source;
 
@@ -127,7 +129,7 @@ public class Streams<K, V, T, U> {
 
         topicProducers.stream()
             .map(pair -> connect(pair.second, pair.first, s))
-            .forEach(publisher -> publisher.subscribe(s.subscriber()));
+            .forEach(publisher -> publisher.subscribe(sinkSubscriber(s)));
 
         return s;
       }
@@ -207,6 +209,18 @@ public class Streams<K, V, T, U> {
   }
 
   /**
+   * Registers an error signal consumer. If one was already registered it will be replaced.
+   *
+   * @param onError the function that consumes the error signals.
+   * @return The stream instance.
+   */
+  public Streams<K, V, T, U> onError(final Consumer<Throwable> onError) {
+    this.onError = onError;
+
+    return this;
+  }
+
+  /**
    * Attaches a reactive stream to a publisher that was created with a previous call to either
    * <code>from</code> or <code>process</code>.
    *
@@ -238,6 +252,12 @@ public class Streams<K, V, T, U> {
     fromPublisher = with(fromPublisher).map(processor).get();
 
     return this;
+  }
+
+  private Subscriber<U> sinkSubscriber(final TopicSink<K, V, U> sink) {
+    return onError != null
+        ? net.pincette.rs.Util.subscribe(onErrorProcessor(onError::accept), sink.subscriber())
+        : sink.subscriber();
   }
 
   /** Starts the streams instance. It blocks until the topic source finishes. */
