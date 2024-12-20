@@ -10,7 +10,7 @@ import java.util.concurrent.Flow.Subscriber;
  * @param <K> the message key type.
  * @param <V> the message value type.
  * @param <T> the type the producer needs to write messages to a topic.
- * @author Werner Donn\u00e9
+ * @author Werner Donné
  */
 public interface TopicSink<K, V, T> {
   /**

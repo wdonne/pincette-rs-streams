@@ -31,7 +31,7 @@ import net.pincette.util.Pair;
  * @param <V> the message value type.
  * @param <T> the type the topic source uses to represent messages.
  * @param <U> the type the topic sink uses to represent messages.
- * @author Werner Donn\u00e9
+ * @author Werner Donné
  */
 public class Streams<K, V, T, U> {
   private static final Duration DEFAULT_GRACE_PERIOD = ofSeconds(3);

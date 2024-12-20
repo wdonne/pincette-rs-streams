@@ -9,7 +9,7 @@ import java.util.Optional;
  *
  * @param <K> the key type.
  * @param <V> the value type.
- * @author Werner Donn\u00e9
+ * @author Werner Donné
  */
 public class Message<K, V> {
   public final Instant timestamp;
