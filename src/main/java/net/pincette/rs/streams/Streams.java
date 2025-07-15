@@ -122,7 +122,7 @@ public class Streams<K, V, T, U> {
 
   private TopicSink<K, V, U> createTopicSink() {
     if (topicSink != null) {
-      final Set<String> topics = topics(topicProducers);
+      final Set<String> topics = sinkTopics();
 
       if (!topics.isEmpty()) {
         final TopicSink<K, V, U> s = topicSink.apply(topics);
@@ -140,7 +140,7 @@ public class Streams<K, V, T, U> {
 
   private TopicSource<K, V, T> createTopicSource() {
     if (topicSource != null) {
-      final Set<String> topics = topics(topicConsumers);
+      final Set<String> topics = sourceTopics();
 
       if (!topics.isEmpty()) {
         final TopicSource<K, V, T> s = topicSource.apply(topics);
@@ -258,6 +258,26 @@ public class Streams<K, V, T, U> {
     return onError != null
         ? net.pincette.rs.Util.subscribe(onErrorProcessor(onError::accept), sink.subscriber())
         : sink.subscriber();
+  }
+
+  /**
+   * Returns all the topics that will be produced to.
+   *
+   * @return The topics.
+   * @since 1.3.0
+   */
+  public Set<String> sinkTopics() {
+    return topics(topicProducers);
+  }
+
+  /**
+   * Returns all the topics that will be consumed from.
+   *
+   * @return The topics.
+   * @since 1.3.0
+   */
+  public Set<String> sourceTopics() {
+    return topics(topicConsumers);
   }
 
   /** Starts the streams instance. It blocks until the topic source finishes. */

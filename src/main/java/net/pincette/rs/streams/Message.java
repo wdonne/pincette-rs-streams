@@ -12,8 +12,8 @@ import java.util.Optional;
  * @author Werner Donné
  */
 public class Message<K, V> {
-  public final Instant timestamp;
   public final K key;
+  public final Instant timestamp;
   public final V value;
 
   public Message() {
