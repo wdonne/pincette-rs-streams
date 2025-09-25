@@ -103,7 +103,7 @@ public class Streams<K, V, T, U> {
   private Subscriber<Message<K, V>> connectTopicConsumers(final String topic) {
     final List<Subscriber<Message<K, V>>> consumers = topicConsumers(topic);
 
-    return consumers.size() > 1 ? Fanout.of(consumers) : consumers.get(0);
+    return consumers.size() > 1 ? Fanout.of(consumers) : consumers.getFirst();
   }
 
   /**
