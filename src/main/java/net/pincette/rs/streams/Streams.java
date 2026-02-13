@@ -34,7 +34,7 @@ import net.pincette.util.Pair;
  * @author Werner Donné
  */
 public class Streams<K, V, T, U> {
-  private static final Duration DEFAULT_GRACE_PERIOD = ofSeconds(3);
+  private static final Duration DEFAULT_GRACE_PERIOD = ofSeconds(10);
   private static final String FROM_ERROR = "No preceding call to from.";
   private static final String TOPIC_SINK_ERROR = "No topic sink.";
   private static final String TOPIC_SOURCE_ERROR = "No topic source.";
